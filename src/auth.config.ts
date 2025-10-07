@@ -47,4 +47,3 @@ export const authConfig = {
   },
   providers: [], // プロバイダーは auth.ts で追加
 } satisfies NextAuthConfig;
-

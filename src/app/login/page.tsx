@@ -13,9 +13,7 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            ログイン
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">ログイン</h2>
           <LoginForm />
         </div>
 
@@ -26,4 +24,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
