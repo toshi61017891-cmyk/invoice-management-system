@@ -1,0 +1,252 @@
+// Prisma Schema - データベース設計
+// Next.jsアプリケーションのデータモデル定義
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// User（ユーザー）- ログインユーザー
+// ========================================
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String?  // Email/Password認証用
+  githubId     String?  @unique // GitHub OAuth用
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // リレーション
+  customers Customer[]
+  quotes    Quote[]
+  invoices  Invoice[]
+  payments  Payment[]
+  mailLogs  MailLog[]
+
+  @@map("users")
+}
+
+// ========================================
+// Customer（顧客）- 請求先の会社・個人
+// ========================================
+model Customer {
+  id        String   @id @default(cuid())
+  name      String // 顧客名・会社名
+  email     String? // 連絡先メールアドレス
+  phone     String? // 電話番号
+  address   String? // 住所
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 作成者
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // リレーション
+  quotes   Quote[]
+  invoices Invoice[]
+
+  @@map("customers")
+}
+
+// ========================================
+// Quote（見積）- 見積書
+// ========================================
+model Quote {
+  id         String      @id @default(cuid())
+  quoteNumber String     @unique // 見積番号（例: QT-2025-0001）
+  status     QuoteStatus @default(DRAFT) // ステータス
+  issuedAt   DateTime?   // 発行日
+  validUntil DateTime?   // 有効期限
+  subtotal   Float       @default(0) // 小計
+  tax        Float       @default(0) // 税額
+  total      Float       @default(0) // 合計
+  notes      String?     // 備考
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // 顧客
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  // 作成者
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // リレーション
+  items    QuoteItem[]
+  invoices Invoice[] // 見積から作成された請求書
+
+  @@map("quotes")
+}
+
+// 見積ステータス
+enum QuoteStatus {
+  DRAFT    // 下書き
+  SENT     // 送信済み
+  ACCEPTED // 承認済み
+  REJECTED // 却下
+}
+
+// ========================================
+// QuoteItem（見積明細）
+// ========================================
+model QuoteItem {
+  id          String   @id @default(cuid())
+  name        String // 品目名・サービス名
+  description String? // 詳細説明
+  quantity    Float // 数量
+  unitPrice   Float // 単価
+  amount      Float // 金額（quantity × unitPrice）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 見積
+  quoteId String
+  quote   Quote  @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@map("quote_items")
+}
+
+// ========================================
+// Invoice（請求書）
+// ========================================
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique // 請求番号（例: INV-2025-0001）
+  status        InvoiceStatus @default(DRAFT) // ステータス
+  issuedAt      DateTime? // 発行日
+  dueDate       DateTime? // 支払期限
+  subtotal      Float         @default(0) // 小計
+  tax           Float         @default(0) // 税額
+  total         Float         @default(0) // 合計
+  paidAmount    Float         @default(0) // 入金済み額
+  notes         String? // 備考
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // 顧客
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  // 作成者
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 見積から作成された場合
+  quoteId String?
+  quote   Quote?  @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+
+  // リレーション
+  items    InvoiceItem[]
+  payments Payment[]
+  mailLogs MailLog[]
+
+  @@map("invoices")
+}
+
+// 請求ステータス
+enum InvoiceStatus {
+  DRAFT     // 下書き
+  SENT      // 送付済み
+  OVERDUE   // 期限切れ
+  PAID      // 支払済み
+  CANCELLED // キャンセル
+}
+
+// ========================================
+// InvoiceItem（請求明細）
+// ========================================
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  name        String // 品目名・サービス名
+  description String? // 詳細説明
+  quantity    Float // 数量
+  unitPrice   Float // 単価
+  amount      Float // 金額（quantity × unitPrice）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 請求
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+// ========================================
+// Payment（入金）
+// ========================================
+model Payment {
+  id        String        @id @default(cuid())
+  amount    Float // 入金額
+  paidAt    DateTime // 入金日
+  method    PaymentMethod @default(BANK_TRANSFER) // 入金方法
+  status    PaymentStatus @default(RECORDED) // ステータス
+  notes     String? // 備考
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // 請求
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // 登録者
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+// 入金方法
+enum PaymentMethod {
+  BANK_TRANSFER // 銀行振込
+  CREDIT_CARD   // クレジットカード
+  CASH          // 現金
+  OTHER         // その他
+}
+
+// 入金ステータス
+enum PaymentStatus {
+  RECORDED    // 記録済み
+  RECONCILED  // 消込済み
+  CANCELLED   // キャンセル
+}
+
+// ========================================
+// MailLog（メール送信履歴）
+// ========================================
+model MailLog {
+  id        String    @id @default(cuid())
+  to        String // 送信先メールアドレス
+  subject   String // 件名
+  status    MailStatus @default(PENDING) // 送信ステータス
+  sentAt    DateTime? // 送信日時
+  error     String? // エラーメッセージ
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // 請求書（オプション）
+  invoiceId String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  // 送信者
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("mail_logs")
+}
+
+// メール送信ステータス
+enum MailStatus {
+  PENDING // 送信待ち
+  SENT    // 送信完了
+  FAILED  // 送信失敗
+}
+

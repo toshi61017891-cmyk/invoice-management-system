@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
+    rgb(var(--background-start-rgb));
+}
+
+/* 選択状態（ドラッグでのテキスト選択）が見えにくい箇所の可視性を改善 */
+::selection {
+  /* 背景: 明るいブルー、文字色: 濃いグレー（高コントラスト） */
+  background: #bfdbfe; /* tailwind sky-200 */
+  color: #111827; /* tailwind gray-900 */
+}
+::-moz-selection {
+  background: #bfdbfe;
+  color: #111827;
+}
+
+/* ボタンやバッジ内のテキスト選択も同一の配色に統一（白地で文字が消える問題の防止） */
+button::selection,
+button *::selection,
+[role="button"]::selection,
+[role="button"] *::selection,
+.badge::selection,
+.badge *::selection {
+  background: #bfdbfe;
+  color: #111827;
+}
