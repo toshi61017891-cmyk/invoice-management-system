@@ -106,6 +106,9 @@ export async function sendInvoiceEmail(invoiceId: string) {
       ],
     });
 
+    // 返却ID（型差異を吸収して最小対応）
+    const emailId = (emailResult as any)?.id ?? (emailResult as any)?.data?.id ?? undefined;
+
     // メール送信履歴を記録
     await prisma.mailLog.create({
       data: {
@@ -130,7 +133,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     return {
       success: true,
       message: `${invoice.customer.email} にメールを送信しました`,
-      emailId: emailResult.id,
+      emailId,
     };
   } catch (error) {
     console.error("メール送信エラー:", error);
