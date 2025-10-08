@@ -5,16 +5,21 @@
  */
 
 import { getCustomers } from "@/app/actions/customers";
-import { CustomersClient } from ".";
+import { CustomersClient } from "./CustomersClient";
 
 // Next.js 15 の型に合わせて Promise 前提にする
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string | string[] }>
+  searchParams: Promise<{ search?: string | string[] }>;
 }) {
   const sp = await searchParams;
-  const search = typeof sp?.search === "string" ? sp.search : Array.isArray(sp?.search) ? sp.search[0] : undefined;
+  const search =
+    typeof sp?.search === "string"
+      ? sp.search
+      : Array.isArray(sp?.search)
+        ? sp.search[0]
+        : undefined;
 
   const result = await getCustomers(search);
   const customers: any[] = (result as any)?.data ?? [];
