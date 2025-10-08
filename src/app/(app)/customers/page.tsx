@@ -7,22 +7,40 @@
 import { getCustomers } from "@/app/actions/customers";
 import { CustomersClient } from "./CustomersClient";
 
+// Next.js 14/15 どちらでも耐える union の型
+type SearchParamsInput =
+  | { search?: string | string[] }
+  | Promise<{ search?: string | string[] }>;
+
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: SearchParamsInput;
 }) {
-  const params = await searchParams;
-  const result = await getCustomers(params.search);
-  const customers = result.success ? result.data : [];
+  // Promise でも平値でも OK にする
+  const sp = await Promise.resolve(searchParams as any);
+
+  // string | string[] | undefined を単一 string | undefined に正規化
+  const search =
+    typeof sp?.search === "string"
+      ? sp.search
+      : Array.isArray(sp?.search)
+      ? sp.search[0]
+      : undefined;
+
+  const result = await getCustomers(search);
+  const customers = result?.success ? result.data : [];
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">顧客管理</h1>
       </div>
 
-      <CustomersClient initialCustomers={customers} initialSearch={params.search} />
+      <CustomersClient
+        initialCustomers={customers}
+        initialSearch={search}
+      />
     </div>
   );
 }
