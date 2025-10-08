@@ -39,7 +39,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const pdfBuffer = await generateInvoicePDF({
       invoiceNumber: invoice.invoiceNumber,
       issuedAt: invoice.issuedAt ?? new Date(),
-      dueDate: invoice.dueDate ?? undefined,
+      dueDate: invoice.dueDate ?? new Date(),
       customer: invoice.customer,
       items: invoice.items.map((item) => ({
         name: item.name,
