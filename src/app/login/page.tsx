@@ -18,7 +18,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>デモアカウント: demo@example.com / password123</p>
+          <p>デモアカウント: demo@example.com / password</p>
         </div>
       </div>
     </div>

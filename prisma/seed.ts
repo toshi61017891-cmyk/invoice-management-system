@@ -26,7 +26,7 @@ async function main() {
   // ========================================
   // 1. ユーザー作成
   // ========================================
-  const hashed = await hash("password123", 10);
+  const hashed = await hash("password", 10);
   const user = await prisma.user.create({
     data: {
       email: "demo@example.com",
