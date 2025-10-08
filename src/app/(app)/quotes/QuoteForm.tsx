@@ -30,8 +30,9 @@ export function QuoteForm({ onClose, onSuccess }: QuoteFormProps) {
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<QuoteFormData, any, QuoteFormData>({
-    resolver: zodResolver(quoteSchema),
+  } = useForm<QuoteFormData>({
+    // 最小で型差分を吸収（ランタイムは zod が担保）
+    resolver: zodResolver(quoteSchema) as any,
     defaultValues: {
       customerId: "",
       issuedAt: undefined,
