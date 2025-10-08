@@ -5,31 +5,19 @@
  */
 
 import { getCustomers } from "@/app/actions/customers";
-import { CustomersClient } from "./CustomersClient";
+import { CustomersClient } from ".";
 
-// Next.js 14/15 どちらでも耐える union の型
-type SearchParamsInput =
-  | { search?: string | string[] }
-  | Promise<{ search?: string | string[] }>;
-
+// Next.js 15 の型に合わせて Promise 前提にする
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: SearchParamsInput;
+  searchParams: Promise<{ search?: string | string[] }>
 }) {
-  // Promise でも平値でも OK にする
-  const sp = await Promise.resolve(searchParams as any);
-
-  // string | string[] | undefined を単一 string | undefined に正規化
-  const search =
-    typeof sp?.search === "string"
-      ? sp.search
-      : Array.isArray(sp?.search)
-      ? sp.search[0]
-      : undefined;
+  const sp = await searchParams;
+  const search = typeof sp?.search === "string" ? sp.search : Array.isArray(sp?.search) ? sp.search[0] : undefined;
 
   const result = await getCustomers(search);
-  const customers = result?.success ? result.data : [];
+  const customers: any[] = (result as any)?.data ?? [];
 
   return (
     <div>
@@ -37,10 +25,7 @@ export default async function CustomersPage({
         <h1 className="text-3xl font-bold text-gray-900">顧客管理</h1>
       </div>
 
-      <CustomersClient
-        initialCustomers={customers}
-        initialSearch={search}
-      />
+      <CustomersClient initialCustomers={customers} initialSearch={search} />
     </div>
   );
 }
