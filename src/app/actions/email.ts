@@ -38,8 +38,8 @@ export async function sendInvoiceEmail(invoiceId: string) {
     // PDF生成
     const pdfBuffer = await generateInvoicePDF({
       invoiceNumber: invoice.invoiceNumber,
-      issuedAt: invoice.issuedAt,
-      dueDate: invoice.dueDate,
+      issuedAt: invoice.issuedAt ?? new Date(),
+      dueDate: invoice.dueDate ?? undefined,
       customer: invoice.customer,
       items: invoice.items.map((item) => ({
         name: item.name,
@@ -90,8 +90,8 @@ export async function sendInvoiceEmail(invoiceId: string) {
         
         <ul>
           <li><strong>請求書番号:</strong> ${invoice.invoiceNumber}</li>
-          <li><strong>発行日:</strong> ${new Date(invoice.issuedAt).toLocaleDateString("ja-JP")}</li>
-          <li><strong>支払期限:</strong> ${new Date(invoice.dueDate).toLocaleDateString("ja-JP")}</li>
+          <li><strong>発行日:</strong> ${invoice.issuedAt ? new Date(invoice.issuedAt).toLocaleDateString("ja-JP") : "-"}</li>
+          <li><strong>支払期限:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("ja-JP") : "-"}</li>
           <li><strong>請求金額:</strong> ¥${invoice.total.toLocaleString()}</li>
         </ul>
         
