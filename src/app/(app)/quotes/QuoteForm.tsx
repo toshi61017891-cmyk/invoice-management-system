@@ -30,7 +30,7 @@ export function QuoteForm({ onClose, onSuccess }: QuoteFormProps) {
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<QuoteFormData>({
+  } = useForm<QuoteFormData, any, QuoteFormData>({
     resolver: zodResolver(quoteSchema),
     defaultValues: {
       customerId: "",
