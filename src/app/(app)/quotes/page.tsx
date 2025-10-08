@@ -15,11 +15,11 @@ export default async function QuotesPage({
 
   // フィルター後のデータ
   const result = await getQuotes(params.status);
-  const quotes = result.success ? result.data : [];
+  const quotes = (result as any)?.data ?? [];
 
   // 全件データ（件数計算用）
   const allResult = await getQuotes();
-  const allQuotes = allResult.success ? allResult.data : [];
+  const allQuotes = (allResult as any)?.data ?? [];
 
   return (
     <div>
