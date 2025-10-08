@@ -1,45 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { deleteCustomer } from "@/app/actions/customers";
 
-interface DeleteCustomerFormProps {
+type Props = {
   customerId: string;
-  customerName: string;
+  customerName?: string | null;
   onSuccess: () => void;
-}
+};
 
-export function DeleteCustomerForm({
-  customerId,
-  customerName,
-  onSuccess,
-}: DeleteCustomerFormProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+// 最小動作：API ルート /api/customers/[id] を想定（DELETE）
+export function DeleteCustomerForm({ customerId, customerName, onSuccess }: Props) {
+  const onDelete = async () => {
+    const ok = confirm(`「${customerName ?? "この顧客"}」を削除します。よろしいですか？`);
+    if (!ok) return;
 
-  const handleDelete = async () => {
-    if (!confirm(`「${customerName}」を削除してもよろしいですか？\nこの操作は取り消せません。`)) {
-      return;
-    }
-
-    setIsDeleting(true);
     try {
-      const result = await deleteCustomer(customerId);
-      if (result.success) {
-        onSuccess();
-      } else {
-        alert(result.error || "削除に失敗しました");
-      }
-    } catch (error) {
-      alert("削除に失敗しました");
-    } finally {
-      setIsDeleting(false);
+      const res = await fetch(`/api/customers/${customerId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await res.text());
+      onSuccess();
+    } catch (e) {
+      console.error("[DeleteCustomerForm] failed:", e);
+      alert("削除に失敗しました。しばらくしてから再度お試しください。");
     }
   };
 
   return (
-    <Button size="sm" variant="danger" onClick={handleDelete} disabled={isDeleting}>
-      {isDeleting ? "削除中..." : "削除"}
+    <Button size="sm" variant="danger" onClick={onDelete}>
+      削除
     </Button>
   );
 }

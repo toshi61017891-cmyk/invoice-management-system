@@ -8,9 +8,7 @@ import type { ReactElement } from "react";
 export async function generateInvoicePDF(
   invoiceData: Parameters<typeof InvoicePDF>[0]["invoice"],
 ): Promise<Buffer> {
-  const pdfElement = (InvoicePDF({ invoice: invoiceData }) as unknown) as ReactElement<
-    Document
-  >;
+  const pdfElement = InvoicePDF({ invoice: invoiceData }) as unknown as ReactElement<Document>;
   const buffer = await renderToBuffer(pdfElement as any);
   return buffer;
 }

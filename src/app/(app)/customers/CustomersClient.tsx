@@ -19,13 +19,14 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/Table";
-import { CustomerForm } from "./CustomerForm";
-import { DeleteCustomerForm } from "./DeleteCustomerForm";
+import { CustomerForm } from ".";
+import { DeleteCustomerForm } from ".";
 
-interface CustomersClientProps {
-  initialCustomers: Customer[];
+type CustomersClientProps = {
+  // 型差異や取得方法差の影響を受けないように最小要件のみ許容
+  initialCustomers: Array<any>;
   initialSearch?: string;
-}
+};
 
 export function CustomersClient({ initialCustomers, initialSearch }: CustomersClientProps) {
   const router = useRouter();
