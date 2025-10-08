@@ -92,3 +92,4 @@ npm run db:studio    # Prisma Studio起動
 # invoice-management-system
 >>>>>>> 45c5742a8b6907b19ae54856429851d4218eee53
 # Updated for deployment
+# Triggering Vercel deployment
