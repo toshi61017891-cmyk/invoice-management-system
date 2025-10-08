@@ -59,10 +59,10 @@ const methodLabels: Record<string, string> = {
 /**
  * ステータスのバッジバリアント
  */
-const statusVariants: Record<string, "default" | "success" | "warning" | "danger"> = {
-  RECORDED: "default",
-  RECONCILED: "success",
-  CANCELLED: "danger",
+const statusVariants: Record<string, "gray" | "blue" | "green" | "yellow" | "red"> = {
+  RECORDED: "gray",
+  RECONCILED: "green",
+  CANCELLED: "red",
 };
 
 /**
