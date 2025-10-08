@@ -1,4 +1,4 @@
-import { renderToBuffer } from "@react-pdf/renderer";
+import { renderToBuffer, Document } from "@react-pdf/renderer";
 import { InvoicePDF } from "./InvoicePDF";
 import type { ReactElement } from "react";
 
@@ -8,7 +8,9 @@ import type { ReactElement } from "react";
 export async function generateInvoicePDF(
   invoiceData: Parameters<typeof InvoicePDF>[0]["invoice"],
 ): Promise<Buffer> {
-  const pdfElement = InvoicePDF({ invoice: invoiceData }) as ReactElement;
-  const buffer = await renderToBuffer(pdfElement);
+  const pdfElement = (InvoicePDF({ invoice: invoiceData }) as unknown) as ReactElement<
+    Document
+  >;
+  const buffer = await renderToBuffer(pdfElement as any);
   return buffer;
 }
