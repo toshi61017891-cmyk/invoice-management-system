@@ -30,7 +30,8 @@ export function PaymentForm({ onSubmit, initialData, availableInvoices, mode }: 
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<PaymentFormData>({
-    resolver: zodResolver(paymentSchema),
+    // 最小で型差分を吸収（Zodでランタイムバリデーション）
+    resolver: zodResolver(paymentSchema) as any,
     defaultValues: {
       ...initialData,
       paidAt: initialData?.paidAt || new Date(),
