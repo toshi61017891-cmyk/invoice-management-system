@@ -134,7 +134,7 @@ export function DashboardClient({ kpi, activities }: DashboardClientProps) {
                   <div className="text-right">
                     <p className="font-semibold text-red-600">¥{invoice.total.toLocaleString()}</p>
                     <p className="text-xs text-gray-500">
-                      期限: {new Date(invoice.dueDate).toLocaleDateString("ja-JP")}
+                      期限: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("ja-JP") : "-"}
                     </p>
                   </div>
                 </div>
