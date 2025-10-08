@@ -20,7 +20,7 @@ import {
   TableCell,
 } from "@/components/ui/Table";
 import { CustomerForm } from "./CustomerForm";
-import { deleteCustomer } from "@/app/actions/customers";
+import { DeleteCustomerForm } from "./DeleteCustomerForm";
 
 interface CustomersClientProps {
   initialCustomers: Customer[];
@@ -40,17 +40,8 @@ export function CustomersClient({ initialCustomers, initialSearch }: CustomersCl
     router.push(`/customers?${params.toString()}`);
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`「${name}」を削除してもよろしいですか？\nこの操作は取り消せません。`)) {
-      return;
-    }
-
-    const result = await deleteCustomer(id);
-    if (result.success) {
-      router.refresh();
-    } else {
-      alert(result.error || "削除に失敗しました");
-    }
+  const handleDeleteSuccess = () => {
+    router.refresh();
   };
 
   const handleFormSuccess = () => {
@@ -149,13 +140,11 @@ export function CustomersClient({ initialCustomers, initialSearch }: CustomersCl
                       >
                         編集
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onClick={() => handleDelete(customer.id, customer.name)}
-                      >
-                        削除
-                      </Button>
+                      <DeleteCustomerForm
+                        customerId={customer.id}
+                        customerName={customer.name}
+                        onSuccess={handleDeleteSuccess}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
